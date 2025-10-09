@@ -1,33 +1,21 @@
 const express = require('express')
 
 const app = express()
-const morgan = require('morgan')
 
-const logger = require('./logger')
-const authorize = require('./authorize')
-    // req => middleware => res
+const people = require('./routes/people')
+const auth = require('./routes/auth')
 
-//midleware, its not practical to copy and paste into all route
+//static asset
+app.use(express.static('./methods-public'))
+//parse form data
+app.use(express.urlencoded({ extended : false}))
+//parse json
+app.use(express.json())
 
-app.use(morgan('tiny'));
-app.use(authorize); 
-
-app.get('/', (req,res)=>{
-    res.send('Home');
-})
-
-app.get('/about', (req,res)=>{
-    res.send('About');
-})
-
-app.get('/api/products', (req,res)=>{
-    res.send('Products');
-})
-
-app.get('/api/items', (req,res)=>{
-    console.log(req.user)
-    res.send('Items');
-})
+//people routes
+app.use('/api/people', people)
+//auth routes
+app.use('/api/auth', auth)
 
 app.listen(3000, ()=>{
     console.log('Server is listening to port 3000')
